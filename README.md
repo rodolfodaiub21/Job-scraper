@@ -31,7 +31,7 @@ Saves results into a clean CSV file for further analysis.
 
 Clone the repo:
 
-git clone https://github.com/rodolfodaiub21/JobScraper.git
+git clone https://github.com/rodolfodaiub21/Job-scraper.git
 cd JobScraper
 
 
