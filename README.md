@@ -31,7 +31,7 @@ Saves results into a clean CSV file for further analysis.
 
 Clone the repo:
 
-git clone https://github.com/your-username/JobScraper.git
+git clone https://github.com/rodolfodaiub21/JobScraper.git
 cd JobScraper
 
 
@@ -51,6 +51,8 @@ pandas
 Run the script with:
 
 python job_scraper.py --role "Cybersecurity Analyst" --remote --out
+<img width="1612" height="190" alt="image" src="https://github.com/user-attachments/assets/476f02b2-e0e2-4dbb-b824-ac20a6fd8018" />
+
 
 Arguments:
 
@@ -96,6 +98,7 @@ Rodolfo Daiub-rodolfodaiub2003@gmail.com
 
 🌍 Interested in: Cybersecurity Analyst, Web Scraping, Remote Tech Roles
 
-📧 Email: [your email here]
+📧 Email: rodolfodaiub2003@gmail.com
 
-💼 LinkedIn: [your LinkedIn here]
+💼 LinkedIn: https://www.linkedin.com/in/rodolfo-daiub-3a2b3928b/
+
