@@ -22,6 +22,8 @@ class JobScraper():
           keywords = f"keywords={role.replace(' ', '%20')}"  
           location="location=Worldwide" if remote else 'location=United%20States'
           remote_param="f_WT=2" if remote else "" #remote parameter for linkedin
+          print("Searching on pages in Linkedin:...")
+
           for page in range(max_pages):
                 
                 try:
@@ -30,84 +32,51 @@ class JobScraper():
                     #RANDOM choice of headers to avoid detection.
                     headers=random.choice(self.headers_list)
                     response=requests.get(url,headers=headers)
-                    soup=BeautifulSoup(response.text,'html.parser')
-                    job_cards=soup.find_all('div',class_='base-search-card')
-                    for card in job_cards:
+                    soup=BeautifulSoup(response.text,'html.parser')      
+                    job_cards=soup.find_all('div',class_='base-search-card__info')
+                    link_job=soup.find_all('a',class_=lambda x:x and 'base-card__full-link' in x.split())
+                    print(len(job_cards),len(link_job))
+                    for card,link in zip(job_cards,link_job):
+                          #print(f"reading card: {i} -> {card} ")
                           try:
-                                title=card.find('h3',class_='base_search_card_title').text.strip()
+                                print('trying...')
+                                title=card.find('h3',class_='base-search-card__title').text.strip()
                                 company=card.find('a',class_='hidden-nested-link').text.strip()
                                 location= card.find('span',class_='job-search-card__location').text.strip()
-                                url=card.find('',class_='base-card__full-link',)['href'].split('?')[0]
+                                url_tag = link
+                                url = url_tag['href'].split('?')[0] if url_tag else None
                                 job_data= {
                                       'Title': title,
                                       'Business':company,
                                       'Loc':location,
                                       'url':url,
                                       'Page':'LinkedIN',
-                                      'date':datetime.now.strftime("%Y-%m-%d")
+                                      'date':datetime.now().strftime("%Y-%m-%d")
                                 }
+                                print("Data to append from Linkedin: ",job_data)
                                 jobs.append(job_data)
                           except Exception as e:
+                                print(F'Exception: ...{e}')   
                                 continue
                     time.sleep(random.uniform(1,3))
 
                 except Exception as e:
                       print("Error during scraping through Linkedin,",e)
-                      print("Response: ",response.text)
+                      #print("Response: ",response.text)
                       continue
           return jobs
 
-    def Scrape_indeed(self,role,remote=False,max_pages=3):
-          print("Searching on indeed")
-          jobs=[]
-          base_url="https://www.indeed.com/jobs"
-          params={
-                'q':role,
-                'l':'remote' if remote else '',
-                'start':0
-          }
-          for page in range(max_pages):
-                
-                try:
-                      params['start']=page*10
-                      headers= random.choice(self.headers_list)
-                      response= requests.get(base_url,headers=headers)
-                      soup = BeautifulSoup(response.text,'html.parser')
-                      job_cards= soup.find_all('div',class_='job_seen_beacon')
-                      for card in job_cards:
-                            try:
-                                  title=card.find('h2',class_='JobTitle').text.strip()
-                                  company=card.find('span',class_='companyName').text.strip()
-                                  location=card.find('div',class_='companyLocation').text.strip()
-                                  url = "https://www.indeed.com" + card.find('a')['href']
-                                  job_data= {
-                                      'Title': title,
-                                      'Business':company,
-                                      'Loc':location,
-                                      'url':url,
-                                      'Page':'indeed',
-                                      'date':datetime.now.strftime("%Y-%m-%d")
-                                }
-                            except Exception as e:
-                                  print('Error on page: ',e )
-                                  continue
-                            time.sleep(random.uniform(1,3))
-                            jobs.append(job_data)              
-
-                except Exception as e:
-                      print("Error on page: ",e)
-                      continue
-          return jobs
+    
     def scrape_all_sources(self,role,remote=False,max_pages=2):
           all_jobs=[]
           linkedin =self.scrape_linkedin(role,remote,max_pages)
           all_jobs.extend(linkedin)
-          indeed=self.Scrape_indeed(role,remote,max_pages)
-          all_jobs.extend(indeed)
+          #indeed=self.Scrape_indeed(role,remote,max_pages)
+          #all_jobs.extend(indeed)
           return all_jobs
     def save_to_csv(self,jobs,filename=None):
             if not filename:
-                timestamp= datetime.now.strftime('%Y-%M-%d')
+                timestamp= datetime.now().strftime('%Y-%M-%d')
                 filename= f'jobs_{timestamp}.csv'
             df=pd.DataFrame(jobs)
             df.to_csv(filename,index=False,encoding='UTF-8')
